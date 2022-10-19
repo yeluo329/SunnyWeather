@@ -1,5 +1,6 @@
 package com.pushpendra.sssssss;
 
+import android.content.res.TypedArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +15,16 @@ import java.util.List;
 
 public class ChorusGameResultAdapter extends RecyclerView.Adapter<ChorusGameResultAdapter.ResultViewHolder> {
     private List<Integer> list = new ArrayList<>();
+    public static final int TYPE_NORMAL = 0;
+    public static final int TYPE_SHARE = 1;
+    private int mode;
 
 
     public void refresh(List<Integer> mList) {
         list.clear();
         list.addAll(mList);
+        mode = TYPE_NORMAL;
         notifyDataSetChanged();
-    }
-
-    public void refreshPartItem(int position) {
-        notifyItemChanged(position, 1);
     }
 
     @NonNull
@@ -37,13 +38,21 @@ public class ChorusGameResultAdapter extends RecyclerView.Adapter<ChorusGameResu
 
     }
 
-    @Override
+
     public void onBindViewHolder(@NonNull ResultViewHolder holder, int position, List payloads) {
         if (payloads.isEmpty()) {
-            holder.bindData(list.get(position));
+            holder.bindData(list.get(position), mode);
         } else {
             holder.showLikeAnim();
         }
+    }
+
+    public void refreshPartItem(int position) {
+        notifyItemChanged(position, 1);
+    }
+
+    public void setMode(int mode) {
+        this.mode = mode;
     }
 
     @Override
@@ -62,11 +71,17 @@ public class ChorusGameResultAdapter extends RecyclerView.Adapter<ChorusGameResu
             numTv = itemView.findViewById(R.id.number_tv);
         }
 
-        public void bindData(int uid) {
+        public void bindData(int uid, int mode) {
             numTv.setText(String.valueOf(uid));
-            likeIv.setOnClickListener(v -> {
-                showLikeAnim();
-            });
+            if (mode == TYPE_SHARE) {
+                likeIv.setVisibility(View.GONE);
+            } else {
+                likeIv.setVisibility(View.VISIBLE);
+                likeIv.setOnClickListener(v -> {
+                    showLikeAnim();
+                });
+            }
+
         }
 
         private void showLikeAnim() {
