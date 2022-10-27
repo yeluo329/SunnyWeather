@@ -5,6 +5,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -16,9 +18,15 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -31,6 +39,11 @@ public class MainActivity extends AppCompatActivity {
     private ConstraintLayout rootLay;
     private ImageView resultIv;
     private ImageView shareIv;
+    private ValueAnimator valueAnimator;
+    private Animation animation;
+    private View view;
+    private TextView progressTv;
+    private TextView chooseTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +69,52 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getBitmap();
+                Bitmap bitmap = getBitmap();
             }
         });
         returnBtn.setOnClickListener(v -> {
-            thumbBmp(getBitmap(), 300, 300);
+            gameResultAdapter.refreshPartItem(1);
+        });
+        ConstraintLayout constraintLayout = findViewById(R.id.view);
+        constraintLayout.post(() -> {
+            initAnimator(constraintLayout.getWidth());
+        });
+
+        view = findViewById(R.id.choose_view);
+        progressTv = findViewById(R.id.progress_tv);
+        chooseTv = findViewById(R.id.choose_tv);
+        constraintLayout.setOnClickListener(v -> {
+            constraintLayout.setBackgroundResource(R.drawable.layer_e0ffee);
+            view.setVisibility(View.VISIBLE);
+            progressTv.setVisibility(View.VISIBLE);
+            valueAnimator.start();
+            startAnimationTv();
+        });
+    }
+
+    private void startAnimationTv() {
+        int[] location = new int[2];
+        chooseTv.getLocationOnScreen(location);
+        int x = location[0];
+        animation = new TranslateAnimation(Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, -(x - dip2px(28)), Animation.ABSOLUTE, 0.0f, Animation.ABSOLUTE, 0.0f);
+        animation.setDuration(1000);
+        animation.setRepeatCount(0);
+        animation.setInterpolator(new DecelerateInterpolator());
+        animation.setFillAfter(true);
+        chooseTv.startAnimation(animation);
+    }
+
+    private void initAnimator(int width) {
+        valueAnimator = ObjectAnimator.ofFloat(0, width * 0.6f);
+        valueAnimator.setDuration(1000);
+        valueAnimator.setInterpolator(new DecelerateInterpolator());
+        valueAnimator.addUpdateListener(animation -> {
+            float currentValue = (float) animation.getAnimatedValue();
+            String progress = (int) (currentValue / width * 100) + "%";
+            progressTv.setText(progress);
+            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) view.getLayoutParams();
+            layoutParams.width = (int) (currentValue);
+            view.setLayoutParams(layoutParams);
         });
     }
 
@@ -75,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
         Canvas topCanvas = new Canvas(topBitmap);
         shareIv.draw(canvas);
         rootLay.draw(topCanvas);
-        //当前bitmap的高度
         int top = dip2px(105);
         int left = dip2px(12);
         Paint paint = new Paint();
@@ -83,8 +136,7 @@ public class MainActivity extends AppCompatActivity {
             ChorusGameResultAdapter.ResultViewHolder holder = gameResultAdapter.createViewHolder(chorusRv, gameResultAdapter.getItemViewType(i));
             holder.itemView.setDrawingCacheEnabled(true);
             holder.itemView.buildDrawingCache();
-            List mList = new ArrayList();
-            gameResultAdapter.onBindViewHolder(holder, i, mList);
+            gameResultAdapter.onBindViewHolder(holder, i);
             holder.itemView.measure(View.MeasureSpec.makeMeasureSpec(chorusRv.getWidth(), View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
             holder.itemView.layout(0, 0, holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight());
@@ -97,16 +149,15 @@ public class MainActivity extends AppCompatActivity {
         }
         gameResultAdapter.setMode(ChorusGameResultAdapter.TYPE_NORMAL);
         canvas.drawBitmap(topBitmap, 0, 0, null);
-        QrcodeView qrcodeView = new QrcodeView(this);
-        qrcodeView.refreshQRCode(rootLay.getWidth(), new LoadCallback() {
-            @Override
-            public void onFinish(Bitmap bitmap) {
-                canvas.drawBitmap(bitmap, 0, dip2px(105) + dip2px(88) * 3 + dip2px(32), null);
-            }
-        });
+//        Bitmap qrcodeBitmap = qrCodeView.getBitmap(rootLay.getMeasuredWidth());
+//        qrcodeView.refreshQRCode(rootLay.getWidth(), new LoadCallback() {
+//            @Override
+//            public void onFinish(Bitmap bitmap) {
+//                canvas.drawBitmap(bitmap, 0, dip2px(105) + dip2px(88) * 3 + dip2px(32), null);
+//            }
+//        });
 
         return bigBitmap;
-
 
 
     }

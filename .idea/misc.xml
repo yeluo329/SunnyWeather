@@ -3,9 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../layout/custom_preview.xml" value="0.39166666666666666" />
+        <entry key="app/src/main/res/drawable/a.xml" value="0.3235" />
+        <entry key="app/src/main/res/drawable/layer_e0ffee.xml" value="3.4914465332031255" />
+        <entry key="app/src/main/res/drawable/shape_dedee0_corner8.xml" value="0.4936676025390626" />
+        <entry key="app/src/main/res/drawable/shape_e0ffee_corner8.xml" value="0.5025" />
         <entry key="app/src/main/res/drawable/shape_ff38d3_corner20.xml" value="0.293" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.3527547200520833" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.5670391061452514" />
         <entry key="app/src/main/res/layout/chorus_user_item.xml" value="0.5208333333333334" />
+        <entry key="app/src/main/res/layout/home_topic_pk_view.xml" value="0.5590006510416666" />
         <entry key="app/src/main/res/layout/qrcode_view.xml" value="0.340625" />
       </map>
     </option>

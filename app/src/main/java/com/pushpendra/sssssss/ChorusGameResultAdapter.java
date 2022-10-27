@@ -35,13 +35,13 @@ public class ChorusGameResultAdapter extends RecyclerView.Adapter<ChorusGameResu
 
     @Override
     public void onBindViewHolder(@NonNull ResultViewHolder holder, int position) {
-
+        holder.bindData(list.get(position), mode);
     }
 
 
-    public void onBindViewHolder(@NonNull ResultViewHolder holder, int position, List payloads) {
+    public void onBindViewHolder(@NonNull ResultViewHolder holder, int position, @NonNull List<Object> payloads) {
         if (payloads.isEmpty()) {
-            holder.bindData(list.get(position), mode);
+            super.onBindViewHolder(holder, position, payloads);
         } else {
             holder.showLikeAnim();
         }
